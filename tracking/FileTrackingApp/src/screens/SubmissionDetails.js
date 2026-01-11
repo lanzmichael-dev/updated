@@ -16,7 +16,7 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import { WebView } from "react-native-webview";
 
-const API_URL = "http://192.168.1.9:3000";
+const API_URL = "http://192.168.1.245:3000";
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
 const SubmissionDetails = ({ navigation, route }) => {
@@ -38,8 +38,15 @@ const SubmissionDetails = ({ navigation, route }) => {
 
   const openFile = async (fileUrl, fileType, fileName) => {
     try {
-      console.log("Opening file:", fileUrl, "Type:", fileType, "Name:", fileName);
-      
+      console.log(
+        "Opening file:",
+        fileUrl,
+        "Type:",
+        fileType,
+        "Name:",
+        fileName
+      );
+
       if (isImageFile(fileType)) {
         // Images will be shown in the modal
         return;
@@ -48,7 +55,9 @@ const SubmissionDetails = ({ navigation, route }) => {
         // This is more reliable than displaying PDF directly in WebView
         console.log("Opening PDF in WebView:", fileUrl);
         // Use Google Docs Viewer for better PDF display compatibility
-        const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=true`;
+        const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(
+          fileUrl
+        )}&embedded=true`;
         setPdfUrl(googleDocsViewerUrl);
         setPdfViewerVisible(true);
       } else {
@@ -75,7 +84,7 @@ const SubmissionDetails = ({ navigation, route }) => {
       // Fetch submissions for this folder
       const res = await fetch(`${API_URL}/folder-submissions/${folder._id}`);
       const data = await res.json();
-      
+
       if (data.success) {
         console.log("Submissions fetched:", data.submissions);
         setSubmissions(data.submissions);
@@ -176,36 +185,46 @@ const SubmissionDetails = ({ navigation, route }) => {
                 <>
                   <View style={styles.modalRow}>
                     <Text style={styles.modalLabel}>File Name:</Text>
-                    <Text style={styles.modalValue}>{selectedFile.fileName}</Text>
+                    <Text style={styles.modalValue}>
+                      {selectedFile.fileName}
+                    </Text>
                   </View>
-                  
+
                   {/* Show message if file URL is not available */}
                   {!selectedFile.fileUrl && (
                     <View style={styles.modalRow}>
                       <Text style={styles.warningText}>
-                        ⚠️ File was uploaded before file viewing was enabled. Please upload the file again to view it.
+                        ⚠️ File was uploaded before file viewing was enabled.
+                        Please upload the file again to view it.
                       </Text>
                     </View>
                   )}
-                  
+
                   {/* Show image if it's an image file */}
-                  {selectedFile.fileUrl && selectedFile.fileType && isImageFile(selectedFile.fileType) && (
-                    <View style={styles.imageContainer}>
-                      <Image
-                        source={{ uri: selectedFile.fileUrl }}
-                        style={styles.previewImage}
-                        resizeMode="contain"
-                        onError={(e) => {
-                          console.error("Image load error:", e);
-                          Alert.alert("Error", "Failed to load image. Please check the server connection.");
-                        }}
-                      />
-                    </View>
-                  )}
+                  {selectedFile.fileUrl &&
+                    selectedFile.fileType &&
+                    isImageFile(selectedFile.fileType) && (
+                      <View style={styles.imageContainer}>
+                        <Image
+                          source={{ uri: selectedFile.fileUrl }}
+                          style={styles.previewImage}
+                          resizeMode="contain"
+                          onError={(e) => {
+                            console.error("Image load error:", e);
+                            Alert.alert(
+                              "Error",
+                              "Failed to load image. Please check the server connection."
+                            );
+                          }}
+                        />
+                      </View>
+                    )}
 
                   <View style={styles.modalRow}>
                     <Text style={styles.modalLabel}>Submitted By:</Text>
-                    <Text style={styles.modalValue}>{selectedFile.username}</Text>
+                    <Text style={styles.modalValue}>
+                      {selectedFile.username}
+                    </Text>
                   </View>
                   <View style={styles.modalRow}>
                     <Text style={styles.modalLabel}>Submitted At:</Text>
@@ -216,21 +235,33 @@ const SubmissionDetails = ({ navigation, route }) => {
                   {selectedFile.notes && (
                     <View style={styles.modalRow}>
                       <Text style={styles.modalLabel}>Notes:</Text>
-                      <Text style={styles.modalValue}>{selectedFile.notes}</Text>
+                      <Text style={styles.modalValue}>
+                        {selectedFile.notes}
+                      </Text>
                     </View>
                   )}
 
                   {/* View File Button for non-images */}
-                  {selectedFile.fileUrl && selectedFile.fileType && !isImageFile(selectedFile.fileType) && (
-                    <TouchableOpacity
-                      style={styles.viewFileButton}
-                      onPress={() => openFile(selectedFile.fileUrl, selectedFile.fileType, selectedFile.fileName)}
-                    >
-                      <Text style={styles.viewFileButtonText}>
-                        {isPdfFile(selectedFile.fileType) ? "📄 View PDF" : "📎 Open File"}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  {selectedFile.fileUrl &&
+                    selectedFile.fileType &&
+                    !isImageFile(selectedFile.fileType) && (
+                      <TouchableOpacity
+                        style={styles.viewFileButton}
+                        onPress={() =>
+                          openFile(
+                            selectedFile.fileUrl,
+                            selectedFile.fileType,
+                            selectedFile.fileName
+                          )
+                        }
+                      >
+                        <Text style={styles.viewFileButtonText}>
+                          {isPdfFile(selectedFile.fileType)
+                            ? "📄 View PDF"
+                            : "📎 Open File"}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                 </>
               )}
             </ScrollView>
@@ -274,7 +305,10 @@ const SubmissionDetails = ({ navigation, route }) => {
               onError={(syntheticEvent) => {
                 const { nativeEvent } = syntheticEvent;
                 console.error("WebView error:", nativeEvent);
-                Alert.alert("Error", "Failed to load PDF. Please check your connection.");
+                Alert.alert(
+                  "Error",
+                  "Failed to load PDF. Please check your connection."
+                );
               }}
             />
           )}
@@ -287,13 +321,13 @@ const SubmissionDetails = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
   },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
   },
   header: {
     backgroundColor: "white",
@@ -373,7 +407,7 @@ const styles = StyleSheet.create({
     color: "#999",
   },
   backButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#ff3d00",
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -444,7 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalCloseBtn: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#ff3d00",
     padding: 15,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -469,7 +503,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   viewFileButton: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#ff3d00",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",

@@ -29,15 +29,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Serve uploaded files statically with proper headers for PDFs
-app.use("/uploads", express.static(uploadsDir, {
-  setHeaders: (res, filePath) => {
-    const ext = path.extname(filePath).toLowerCase();
-    if (ext === '.pdf') {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'inline');
-    }
-  }
-}));
+app.use(
+  "/uploads",
+  express.static(uploadsDir, {
+    setHeaders: (res, filePath) => {
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === ".pdf") {
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "inline");
+      }
+    },
+  })
+);
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/trackingDB")
@@ -88,17 +91,21 @@ const getFolderModel = (department) => {
 app.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     if (!username || !password) {
-      return res.status(400).json({ success: false, message: "Username and password required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Username and password required" });
     }
-    
+
     const user = await User.findOne({ username, password });
-    
+
     if (user) {
       return res.json({ success: true, user });
     } else {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
   } catch (error) {
     console.error("Login error:", error);
@@ -143,15 +150,78 @@ app.delete("/delete-folder/:department/:id", async (req, res) => {
   }
 });
 
+// Update folder (PUT method)
+app.put("/update-folder/:department/:id", async (req, res) => {
+  try {
+    console.log("Update folder request (PUT):", {
+      params: req.params,
+      body: req.body,
+    });
+    const { name, description, deadline } = req.body;
+    const FolderModel = getFolderModel(req.params.department);
+    const updated = await FolderModel.findByIdAndUpdate(
+      req.params.id,
+      { name, description, deadline },
+      { new: true }
+    );
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Folder not found" });
+    }
+    res.json({ success: true, folder: updated });
+  } catch (error) {
+    console.error("Update folder error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update folder (POST method - backup)
+app.post("/update-folder/:department/:id", async (req, res) => {
+  try {
+    console.log("Update folder request (POST):", {
+      params: req.params,
+      body: req.body,
+    });
+    const { name, description, deadline } = req.body;
+    const FolderModel = getFolderModel(req.params.department);
+    const updated = await FolderModel.findByIdAndUpdate(
+      req.params.id,
+      { name, description, deadline },
+      { new: true }
+    );
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Folder not found" });
+    }
+    res.json({ success: true, folder: updated });
+  } catch (error) {
+    console.error("Update folder error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Submit File Route (defined once)
 app.post("/submit-file", upload.single("file"), async (req, res) => {
   try {
     console.log("File upload request received");
     console.log("Request body:", req.body);
-    console.log("Request file:", req.file ? { name: req.file.originalname, size: req.file.size, mimetype: req.file.mimetype } : "No file");
-    
+    console.log(
+      "Request file:",
+      req.file
+        ? {
+            name: req.file.originalname,
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+          }
+        : "No file"
+    );
+
     if (!req.file) {
-      return res.status(400).json({ success: false, error: "No file uploaded" });
+      return res
+        .status(400)
+        .json({ success: false, error: "No file uploaded" });
     }
 
     const { folderId, username, notes } = req.body;
@@ -165,7 +235,11 @@ app.post("/submit-file", upload.single("file"), async (req, res) => {
     });
     await newSubmission.save();
     console.log("File saved successfully:", newSubmission.filePath);
-    res.json({ success: true, message: "File submitted successfully!", submission: newSubmission });
+    res.json({
+      success: true,
+      message: "File submitted successfully!",
+      submission: newSubmission,
+    });
   } catch (error) {
     console.error("File upload error:", error);
     res.status(500).json({ success: false, error: error.message });
@@ -175,7 +249,9 @@ app.post("/submit-file", upload.single("file"), async (req, res) => {
 // Get User Submissions
 app.get("/user-submissions/:username", async (req, res) => {
   try {
-    const submissions = await Submission.find({ username: req.params.username });
+    const submissions = await Submission.find({
+      username: req.params.username,
+    });
     res.json({ success: true, submissions });
   } catch (error) {
     console.error("Error fetching submissions:", error);
@@ -188,7 +264,9 @@ app.get("/semiadmin-departments", async (req, res) => {
   try {
     const semiAdmins = await User.find({ role: "semi-admin" });
     // Get unique departments
-    const departments = [...new Set(semiAdmins.map(user => user.department).filter(Boolean))];
+    const departments = [
+      ...new Set(semiAdmins.map((user) => user.department).filter(Boolean)),
+    ];
     res.json({ success: true, departments });
   } catch (error) {
     console.error("Error fetching semi-admin departments:", error);
@@ -216,7 +294,9 @@ app.post("/create-user", async (req, res) => {
 
     // Validation
     if (!username || !password || !name || !role || !department) {
-      return res.status(400).json({ success: false, error: "All fields are required" });
+      return res
+        .status(400)
+        .json({ success: false, error: "All fields are required" });
     }
 
     if (role !== "semi-admin" && role !== "user") {
@@ -226,7 +306,9 @@ app.post("/create-user", async (req, res) => {
     // Check if username already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ success: false, error: "Username already exists" });
+      return res
+        .status(400)
+        .json({ success: false, error: "Username already exists" });
     }
 
     const newUser = new User({
@@ -238,7 +320,10 @@ app.post("/create-user", async (req, res) => {
     });
 
     await newUser.save();
-    res.json({ success: true, user: { ...newUser.toObject(), password: undefined } });
+    res.json({
+      success: true,
+      user: { ...newUser.toObject(), password: undefined },
+    });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ success: false, error: error.message });
@@ -249,7 +334,9 @@ app.post("/create-user", async (req, res) => {
 app.get("/departments", async (req, res) => {
   try {
     const users = await User.find({ department: { $exists: true, $ne: null } });
-    const departments = [...new Set(users.map(user => user.department).filter(Boolean))];
+    const departments = [
+      ...new Set(users.map((user) => user.department).filter(Boolean)),
+    ];
     res.json({ success: true, departments });
   } catch (error) {
     console.error("Error fetching departments:", error);
@@ -260,12 +347,16 @@ app.get("/departments", async (req, res) => {
 // Get Submissions for a Folder
 app.get("/folder-submissions/:folderId", async (req, res) => {
   try {
-    const submissions = await Submission.find({ folderId: req.params.folderId });
+    const submissions = await Submission.find({
+      folderId: req.params.folderId,
+    });
     // Add file URL to each submission
     const baseUrl = `http://${req.get("host")}`;
     const submissionsWithUrls = submissions.map((submission) => ({
       ...submission.toObject(),
-      fileUrl: submission.filePath ? `${baseUrl}/uploads/${submission.filePath}` : null,
+      fileUrl: submission.filePath
+        ? `${baseUrl}/uploads/${submission.filePath}`
+        : null,
     }));
     res.json({ success: true, submissions: submissionsWithUrls });
   } catch (error) {
@@ -280,14 +371,30 @@ app.get("/file/:filePath", (req, res) => {
   if (fs.existsSync(filePath)) {
     // Set proper headers for PDF viewing
     const ext = path.extname(filePath).toLowerCase();
-    if (ext === '.pdf') {
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'inline; filename="' + path.basename(filePath) + '"');
+    if (ext === ".pdf") {
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        'inline; filename="' + path.basename(filePath) + '"'
+      );
     }
     res.sendFile(filePath);
   } else {
     res.status(404).json({ success: false, error: "File not found" });
   }
+});
+
+// 404 -> return JSON instead of HTML
+app.use((req, res) => {
+  res.status(404).json({ success: false, error: "Not found" });
+});
+
+// Error handler -> return JSON
+app.use((err, req, res, next) => {
+  console.error("Unhandled server error:", err);
+  res
+    .status(500)
+    .json({ success: false, error: err.message || "Server error" });
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));

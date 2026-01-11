@@ -11,7 +11,7 @@ import {
 import * as DocumentPicker from "expo-document-picker"; // Requires: npx expo install expo-document-picker
 import { globalStyles } from "../styles/globalStyles";
 
-const API_URL = "http://192.168.1.9:3000";
+const API_URL = "http://192.168.1.245:3000";
 
 const FolderUploadDetail = ({ route, navigation }) => {
   const { folder, user, submitted } = route.params;
@@ -116,12 +116,12 @@ const FolderUploadDetail = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "white" },
+  container: { flex: 1, padding: 20, backgroundColor: "#ffffff" },
   title: { fontSize: 24, fontWeight: "bold" },
   desc: { marginVertical: 15, color: "#666" },
   deadline: { color: "red", fontWeight: "bold" },
   uploadBtn: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#ff3d00",
     padding: 15,
     borderRadius: 10,
     marginTop: 30,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   submit: {
     flex: 0.45,
-    backgroundColor: "#28a745",
+    backgroundColor: "#ff3d00",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",

@@ -1,14 +1,14 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export const colors = {
-  primary: '#2196F3',
-  secondary: '#4CAF50',
-  danger: '#F44336',
-  warning: '#FF9800',
-  white: '#FFFFFF',
-  black: '#000000',
-  gray: '#9E9E9E',
-  lightGray: '#F5F5F5',
+  primary: "#ff3d00",
+  secondary: "#4CAF50",
+  danger: "#F44336",
+  warning: "#FF9800",
+  white: "#FFFFFF",
+  black: "#000000",
+  gray: "#9E9E9E",
+  lightGray: "#F5F5F5",
 };
 
 export const globalStyles = StyleSheet.create({
@@ -32,14 +32,14 @@ export const globalStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
     marginHorizontal: 15,
   },
   buttonText: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   input: {
     borderWidth: 1,

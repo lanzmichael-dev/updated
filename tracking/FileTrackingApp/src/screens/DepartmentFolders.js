@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 
-const API_URL = "http://192.168.1.9:3000";
+const API_URL = "http://192.168.1.245:3000";
 
 const DepartmentFolders = ({ navigation, route }) => {
   const { department } = route.params;
@@ -89,12 +89,12 @@ const DepartmentFolders = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
   },
   header: {
     backgroundColor: "white",

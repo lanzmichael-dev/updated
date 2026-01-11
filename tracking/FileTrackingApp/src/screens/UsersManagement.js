@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const API_URL = "http://192.168.1.9:3000";
+const API_URL = "http://192.168.1.245:3000";
 
 const UsersManagement = ({ navigation, route }) => {
   const [users, setUsers] = useState([]);
@@ -65,7 +65,8 @@ const UsersManagement = ({ navigation, route }) => {
       return Alert.alert("Error", "Please fill in all required fields");
     }
 
-    const selectedDept = department === "new" ? newDepartment.trim() : department;
+    const selectedDept =
+      department === "new" ? newDepartment.trim() : department;
     if (!selectedDept) {
       return Alert.alert("Error", "Please select or enter a department");
     }
@@ -162,7 +163,9 @@ const UsersManagement = ({ navigation, route }) => {
                     </View>
                   </View>
                   <Text style={styles.userUsername}>@{item.username}</Text>
-                  <Text style={styles.userDepartment}>📍 {item.department}</Text>
+                  <Text style={styles.userDepartment}>
+                    📍 {item.department}
+                  </Text>
                 </View>
               </View>
             )}
@@ -264,7 +267,10 @@ const UsersManagement = ({ navigation, route }) => {
                 >
                   <Text style={styles.cancelBtnText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.createBtn} onPress={handleCreateUser}>
+                <TouchableOpacity
+                  style={styles.createBtn}
+                  onPress={handleCreateUser}
+                >
                   <Text style={styles.createBtnText}>Create</Text>
                 </TouchableOpacity>
               </View>
@@ -277,12 +283,12 @@ const UsersManagement = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, backgroundColor: "#ffffff" },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ffffff",
   },
   header: {
     flexDirection: "row",
@@ -295,7 +301,7 @@ const styles = StyleSheet.create({
   },
   backButton: { fontSize: 16, color: "#007bff", fontWeight: "600" },
   title: { fontSize: 18, fontWeight: "bold", flex: 1, textAlign: "center" },
-  addButton: { fontSize: 16, color: "#28a745", fontWeight: "bold" },
+  addButton: { fontSize: 16, color: "#ff3d00", fontWeight: "bold" },
   content: { flex: 1, padding: 20 },
   sectionTitle: {
     fontSize: 16,
@@ -412,7 +418,7 @@ const styles = StyleSheet.create({
   cancelBtnText: { color: "white", fontWeight: "bold" },
   createBtn: {
     flex: 0.45,
-    backgroundColor: "#28a745",
+    backgroundColor: "#ff3d00",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",

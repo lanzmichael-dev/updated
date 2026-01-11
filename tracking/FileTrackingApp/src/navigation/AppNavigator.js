@@ -23,42 +23,42 @@ const AppNavigator = () => {
       <Stack.Screen
         name="AdminDashboard"
         component={AdminDashboard}
-        options={{ title: "Admin Dashboard" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="SemiAdminDashboard"
         component={SemiAdminDashboard}
-        options={{ title: "Admin" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="UserDashboard"
         component={UserDashboard}
-        options={{ title: "Folders" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="FolderUpload"
         component={FolderUpload}
-        options={{ title: "Submission" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="FolderUploadDetail"
         component={FolderDetailsScreen}
-        options={{ title: "Folder Details" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="SubmissionDetails"
         component={SubmissionDetails}
-        options={{ title: "Submissions" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="DepartmentFolders"
         component={DepartmentFolders}
-        options={{ title: "Department Folders" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="UsersManagement"
         component={UsersManagement}
-        options={{ title: "Users Management" }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
