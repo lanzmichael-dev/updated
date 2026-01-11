@@ -46,14 +46,16 @@ const AdminDashboard = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/translogo.png")}
-          style={styles.headerLogo}
-        />
-        <View>
-          <Text style={styles.welcome}>welcome back</Text>
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.role}>Admin</Text>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require("../../assets/images/translogo.png")}
+            style={styles.headerLogo}
+          />
+          <View>
+            <Text style={styles.welcome}>welcome back</Text>
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.role}>Admin</Text>
+          </View>
         </View>
         <TouchableOpacity onPress={() => navigation.replace("Login")}>
           <Text style={styles.logout}>Logout</Text>
@@ -117,6 +119,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#242323",
     elevation: 0,
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   headerLogo: {
     width: 60,
@@ -130,8 +137,6 @@ const styles = StyleSheet.create({
   logout: {
     color: "#c15e0e",
     fontWeight: "bold",
-    marginTop: 10,
-    marginLeft: 120,
   },
   content: { flex: 1, padding: 20 },
   sectionTitle: {
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#e8e8e8",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,

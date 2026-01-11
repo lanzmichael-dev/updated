@@ -5,7 +5,6 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Image,
 } from "react-native";
 import { globalStyles } from "../styles/globalStyles";
@@ -16,7 +15,6 @@ const UserDashboard = ({ navigation, route }) => {
   const { user } = route.params;
   const [folders, setFolders] = useState([]);
   const [submissions, setSubmissions] = useState([]);
-  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,22 +25,27 @@ const UserDashboard = ({ navigation, route }) => {
       if (fData.success) setFolders(fData.folders);
       if (sData.success) setSubmissions(sData.submissions);
     };
+
     fetchData();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", fetchData);
+    return unsubscribe;
+  }, [navigation]);
 
   const isSubmitted = (id) => submissions.some((s) => s.folderId === id);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/translogo.png")}
-          style={styles.headerLogo}
-        />
-        <View>
-          <Text style={styles.welcome}>Student Portal</Text>
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.dept}>{user.department}</Text>
+        <View style={styles.headerLeft}>
+          <Image
+            source={require("../../assets/images/translogo.png")}
+            style={styles.headerLogo}
+          />
+          <View>
+            <Text style={styles.welcome}>Student Portal</Text>
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.dept}>{user.department}</Text>
+          </View>
         </View>
         <TouchableOpacity onPress={() => navigation.replace("Login")}>
           <Text style={styles.logout}>Logout</Text>
@@ -50,15 +53,8 @@ const UserDashboard = ({ navigation, route }) => {
       </View>
 
       <View style={styles.content}>
-        <TextInput
-          style={globalStyles.input}
-          placeholder="Filter by folder name..."
-          onChangeText={setFilter}
-        />
         <FlatList
-          data={folders.filter((f) =>
-            f.name.toLowerCase().includes(filter.toLowerCase())
-          )}
+          data={folders}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => {
             const done = isSubmitted(item._id);
@@ -107,6 +103,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#242323",
     elevation: 0,
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   headerLogo: {
     width: 60,
@@ -120,13 +121,11 @@ const styles = StyleSheet.create({
   logout: {
     color: "#c15e0e",
     fontWeight: "bold",
-    marginTop: 10,
-    marginLeft: 120,
   },
   content: { flex: 1, padding: 20 },
   card: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#e8e8e8",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,

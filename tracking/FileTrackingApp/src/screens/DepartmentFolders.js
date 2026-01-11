@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Platform,
 } from "react-native";
 
 const API_URL = "http://192.168.1.245:3000";
@@ -44,6 +45,16 @@ const DepartmentFolders = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+        <View style={styles.backBtn} />
+      </View>
+
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>📁 {department}</Text>
@@ -90,6 +101,15 @@ const DepartmentFolders = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#ffffff" },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: Platform.OS === "ios" ? 60 : 50,
+    paddingBottom: 20,
+    paddingHorizontal: 8,
+  },
+  backBtn: { width: 70 },
+  backText: { color: "#007aff", fontWeight: "600" },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
@@ -97,9 +117,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   header: {
-    backgroundColor: "white",
+    backgroundColor: "#242323",
     padding: 20,
-    paddingTop: 50,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     elevation: 2,
@@ -108,15 +127,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "white",
   },
   subtitle: {
     fontSize: 14,
-    color: "#666",
+    color: "#f2760a",
   },
   content: { flex: 1, padding: 20 },
   card: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#e8e8e8",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,

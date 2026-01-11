@@ -21,6 +21,10 @@ const UsersManagement = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
 
+  // Filter state
+  const [filterDepartment, setFilterDepartment] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+
   // Form state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -115,6 +119,13 @@ const UsersManagement = ({ navigation, route }) => {
     return userRole === "semi-admin" ? "👨‍💼 Semi-Admin" : "👤 User";
   };
 
+  // Filter users based on selected filters
+  const filteredUsers = users.filter((user) => {
+    const matchesDepartment = !filterDepartment || user.department === filterDepartment;
+    const matchesRole = !filterRole || user.role === filterRole;
+    return matchesDepartment && matchesRole;
+  });
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -136,15 +147,49 @@ const UsersManagement = ({ navigation, route }) => {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>All Users ({users.length})</Text>
+        <Text style={styles.sectionTitle}>All Users ({filteredUsers.length})</Text>
 
-        {users.length === 0 ? (
+        {/* Filter Section */}
+        <View style={styles.filterContainer}>
+          <View style={styles.filterRow}>
+            <Text style={styles.filterLabel}>Department:</Text>
+            <View style={styles.filterPickerContainer}>
+              <Picker
+                selectedValue={filterDepartment}
+                onValueChange={(itemValue) => setFilterDepartment(itemValue)}
+                style={styles.filterPicker}
+              >
+                <Picker.Item label="All Departments" value="" />
+                {departments.map((dept) => (
+                  <Picker.Item key={dept} label={dept} value={dept} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+
+          <View style={styles.filterRow}>
+            <Text style={styles.filterLabel}>Role:</Text>
+            <View style={styles.filterPickerContainer}>
+              <Picker
+                selectedValue={filterRole}
+                onValueChange={(itemValue) => setFilterRole(itemValue)}
+                style={styles.filterPicker}
+              >
+                <Picker.Item label="All Roles" value="" />
+                <Picker.Item label="👤 User" value="user" />
+                <Picker.Item label="👨‍💼 Semi-Admin" value="semi-admin" />
+              </Picker>
+            </View>
+          </View>
+        </View>
+
+        {filteredUsers.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No users found</Text>
           </View>
         ) : (
           <FlatList
-            data={users}
+            data={filteredUsers}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <View style={styles.userCard}>
@@ -164,7 +209,7 @@ const UsersManagement = ({ navigation, route }) => {
                   </View>
                   <Text style={styles.userUsername}>@{item.username}</Text>
                   <Text style={styles.userDepartment}>
-                    📍 {item.department}
+                    {item.department}
                   </Text>
                 </View>
               </View>
@@ -308,6 +353,35 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
     color: "#333",
+  },
+  filterContainer: {
+    backgroundColor: "#f8f9fa",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  filterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  filterLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    width: 100,
+  },
+  filterPickerContainer: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: "white",
+  },
+  filterPicker: {
+    height: 40,
+    fontSize: 11,
   },
   userCard: {
     backgroundColor: "white",

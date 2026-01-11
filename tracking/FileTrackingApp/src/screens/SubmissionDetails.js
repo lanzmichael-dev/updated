@@ -11,6 +11,7 @@ import {
   Image,
   Dimensions,
   Alert,
+  Platform,
 } from "react-native";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
@@ -27,6 +28,22 @@ const SubmissionDetails = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [pdfViewerVisible, setPdfViewerVisible] = useState(false);
   const [pdfUrl, setPdfUrl] = useState(null);
+
+  const isLateSubmission = (submittedAt, deadline) => {
+    const submittedDate = new Date(submittedAt);
+    const deadlineDate = new Date(deadline);
+    return submittedDate > deadlineDate;
+  };
+
+  const getSubmissionStatus = (submittedAt, deadline) => {
+    if (isLateSubmission(submittedAt, deadline)) {
+      const diff = Math.floor(
+        (new Date(submittedAt) - new Date(deadline)) / (1000 * 60 * 60 * 24)
+      );
+      return { label: `Late (${diff}d)`, color: "#f44336" };
+    }
+    return { label: "Early", color: "#4CAF50" };
+  };
 
   const isImageFile = (fileType) => {
     return fileType && fileType.startsWith("image/");
@@ -106,6 +123,16 @@ const SubmissionDetails = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+        <View style={styles.backBtn} />
+      </View>
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>📁 {folder.name}</Text>
@@ -148,19 +175,29 @@ const SubmissionDetails = ({ navigation, route }) => {
                     Submitted: {new Date(item.submittedAt).toLocaleString()}
                   </Text>
                 </View>
+                <View
+                  style={[
+                    styles.statusBadge,
+                    {
+                      backgroundColor: getSubmissionStatus(
+                        item.submittedAt,
+                        folder.deadline
+                      ).color,
+                    },
+                  ]}
+                >
+                  <Text style={styles.statusBadgeText}>
+                    {
+                      getSubmissionStatus(item.submittedAt, folder.deadline)
+                        .label
+                    }
+                  </Text>
+                </View>
               </TouchableOpacity>
             )}
           />
         )}
       </View>
-
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>Back</Text>
-      </TouchableOpacity>
 
       {/* File Details Modal */}
       <Modal
@@ -323,6 +360,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#ffffff",
   },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: Platform.OS === "ios" ? 60 : 50,
+    paddingBottom: 20,
+    paddingHorizontal: 8,
+  },
+  backBtn: { width: 70 },
+  backText: { color: "#007aff", fontWeight: "600" },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
@@ -372,9 +418,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   submissionInfo: {
     marginRight: 10,
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    minWidth: 60,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statusBadgeText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "bold",
   },
   submitterName: {
     fontSize: 15,
