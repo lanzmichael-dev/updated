@@ -225,21 +225,54 @@ app.post("/submit-file", upload.single("file"), async (req, res) => {
     }
 
     const { folderId, username, notes } = req.body;
-    const newSubmission = new Submission({
+    
+    // Check if submission already exists for this folder and user
+    let existingSubmission = await Submission.findOne({
       folderId,
       username,
-      fileName: req.file.originalname,
-      filePath: req.file.filename,
-      fileType: req.file.mimetype,
-      notes,
     });
-    await newSubmission.save();
-    console.log("File saved successfully:", newSubmission.filePath);
-    res.json({
-      success: true,
-      message: "File submitted successfully!",
-      submission: newSubmission,
-    });
+
+    if (existingSubmission) {
+      // Delete old file if it exists
+      if (existingSubmission.filePath) {
+        const oldFilePath = path.join(uploadsDir, existingSubmission.filePath);
+        if (fs.existsSync(oldFilePath)) {
+          fs.unlinkSync(oldFilePath);
+        }
+      }
+      
+      // Update existing submission
+      existingSubmission.fileName = req.file.originalname;
+      existingSubmission.filePath = req.file.filename;
+      existingSubmission.fileType = req.file.mimetype;
+      existingSubmission.notes = notes || "";
+      existingSubmission.submittedAt = new Date();
+      await existingSubmission.save();
+      
+      console.log("File updated successfully:", existingSubmission.filePath);
+      res.json({
+        success: true,
+        message: "File updated successfully!",
+        submission: existingSubmission,
+      });
+    } else {
+      // Create new submission
+      const newSubmission = new Submission({
+        folderId,
+        username,
+        fileName: req.file.originalname,
+        filePath: req.file.filename,
+        fileType: req.file.mimetype,
+        notes,
+      });
+      await newSubmission.save();
+      console.log("File saved successfully:", newSubmission.filePath);
+      res.json({
+        success: true,
+        message: "File submitted successfully!",
+        submission: newSubmission,
+      });
+    }
   } catch (error) {
     console.error("File upload error:", error);
     res.status(500).json({ success: false, error: error.message });
@@ -381,6 +414,70 @@ app.get("/file/:filePath", (req, res) => {
     res.sendFile(filePath);
   } else {
     res.status(404).json({ success: false, error: "File not found" });
+  }
+});
+
+// Get a specific user submission for a folder
+app.get("/submission/:folderId/:username", async (req, res) => {
+  try {
+    const submission = await Submission.findOne({
+      folderId: req.params.folderId,
+      username: req.params.username,
+    });
+    if (submission) {
+      const baseUrl = `http://${req.get("host")}`;
+      const submissionWithUrl = {
+        ...submission.toObject(),
+        fileUrl: submission.filePath
+          ? `${baseUrl}/uploads/${submission.filePath}`
+          : null,
+      };
+      res.json({ success: true, submission: submissionWithUrl });
+    } else {
+      res.json({ success: true, submission: null });
+    }
+  } catch (error) {
+    console.error("Error fetching submission:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Unsubmit/Delete a submission
+app.post("/unsubmit-file", async (req, res) => {
+  try {
+    const { folderId, username } = req.body;
+    
+    if (!folderId || !username) {
+      return res.status(400).json({
+        success: false,
+        error: "folderId and username are required",
+      });
+    }
+
+    const submission = await Submission.findOneAndDelete({
+      folderId,
+      username,
+    });
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        error: "Submission not found",
+      });
+    }
+
+    // Delete the file from the uploads directory
+    if (submission.filePath) {
+      const filePath = path.join(uploadsDir, submission.filePath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    res.json({ success: true, message: "Submission deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting submission:", error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
